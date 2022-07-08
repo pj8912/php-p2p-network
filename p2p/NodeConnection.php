@@ -42,7 +42,8 @@ class NodeConnection{
 		socket_bind($this->sock , $this->host, $this->port);
 		socket_listen($this->sock);
 		socket_set_nonblock($this->sock);
-	
+		set_time_limit(0);
+
 	}
 
 	public function connections(){
@@ -116,7 +117,13 @@ class NodeConnection{
 				socket_close($sock);
 				return true;
 			}		
-			$this->nodes_outbound[] = $connected_node_id;
+			
+			$this->nodes_outbound[] =[
+				'id'=> $connected_node_id,
+				'host' => $host,
+				'port' => $port
+			];
+
 			$this->new_sock = $sock;
 
 			print_r($this->allNodes());
