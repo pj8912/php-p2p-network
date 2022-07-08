@@ -32,9 +32,9 @@ class NodeConnection{
 	
 
 	public function generate_id(){
-		$id = $this->host.strval($this->port).rand(1,9999999);
-		$id = hash('sha1', $id);
-		return strval($id);
+		$id = $this->host.strval($this->port).strval(rand(1,9999999));
+		$id = sha1($id);
+		return $id;
 	}
 
 	public function start(){
@@ -67,7 +67,7 @@ class NodeConnection{
 
 		for($i=0; $i < sizeof($nodes); $i++){
 			
-			$this->send($this->new_sock, $data);
+			$this->send($this->sock, $data);
 		}
 	}
 
@@ -107,9 +107,17 @@ class NodeConnection{
 		
 			socket_connect($sock, $host, $port);
 		
-			socket_send($sock, strval($this->id) , strlen($this->id), MSG_EOF);
+			socket_send($sock, $this->id , strlen($this->id), MSG_EOF);
 
-			$buf = strval($this->id);
+			 // $this->nodes_inbound[]  =[
+                           //     'id '=> $this->id,
+                             //   'host'  => $host,
+                               // 'port'  => $port
+                        //];
+
+
+			
+			//$buf = $this->id;
 			$connected_node_id = socket_recv($sock, $buf, 4096, MSG_WAITALL);	
 
 			if( $this->id == $connected_node_id ){
@@ -118,11 +126,19 @@ class NodeConnection{
 				return true;
 			}		
 			
-			$this->nodes_outbound[] =[
-				'id'=> $connected_node_id,
-				'host' => $host,
-				'port' => $port
+			$this->nodes_outbound[]  =[
+				'id '=> $connected_node_id,
+				'host'  => $host,
+				'port'  => $port
 			];
+
+			  $this->nodes_inbound[]  =[
+                                'id '=> $this->id,
+                                'host'  => $host,
+                                'port'  => $port
+                        ];
+
+
 
 			$this->new_sock = $sock;
 
